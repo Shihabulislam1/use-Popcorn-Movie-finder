@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 const tempMovieData = [
@@ -51,9 +51,42 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
+const key = "fbbfa667";
+
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
+  const [query, setQuery] = useState("inception");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(
+    function () {
+      async function fetchData() {
+        try {
+          setIsLoading(true);
+          const res = await fetch(
+            `http://www.omdbapi.com/?s=${query}&apikey=${key}`
+          );
+
+          if (!res.ok) {
+            throw new Error("Something went wrong with the request");
+          }
+          if(data.response === "False"){
+            throw new Error(data.Error);
+          }
+          const data = await res.json();
+          setMovies(data.Search);
+        } catch (err) {
+          setError(err.message);
+        } finally{
+          setIsLoading(false);
+        }
+      }
+      fetchData();
+    },
+    [query]
+  );
+
   return (
     <>
       <NavBar>
@@ -62,7 +95,10 @@ export default function App() {
 
       <Main>
         <Box>
-          <MovieList movies={movies} />
+          {/* {isLoading?<Loader/>: <MovieList movies={movies} />} */}
+          {isLoading && <Loader />}
+          {!isLoading && !error && <MovieList movies={movies} />}
+          {error && <ErrorMessage message={error} />}
         </Box>
         <Box>
           <WatchedSummary watched={watched} />
@@ -70,6 +106,24 @@ export default function App() {
         </Box>
       </Main>
     </>
+  );
+}
+
+function Loader() {
+  return (
+    <div className="loader">
+      <div className="loader__icon"></div>
+      <p className="loader__text">Loading...</p>
+    </div>
+  );
+}
+
+function ErrorMessage({ message }) {
+  return (
+    <p className="error">
+      <span>⚠️</span>
+      {message}
+    </p>
   );
 }
 
@@ -83,7 +137,7 @@ function NavBar({ children }) {
   );
 }
 NavBar.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };
 
 function NumResults({ movies }) {
@@ -94,7 +148,7 @@ function NumResults({ movies }) {
   );
 }
 NumResults.propTypes = {
-  movies: PropTypes.array.isRequired, // Assuming movies is an array
+  movies: PropTypes.array, // Assuming movies is an array
 };
 
 function Logo() {
@@ -123,7 +177,7 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 Main.propTypes = {
-  children: PropTypes.node.isRequired, // Assuming movies is an array
+  children: PropTypes.node, // Assuming movies is an array
 };
 
 function Box({ children }) {
@@ -139,7 +193,7 @@ function Box({ children }) {
   );
 }
 Box.propTypes = {
-  children: PropTypes.node.isRequired, // Assuming movies is an array
+  children: PropTypes.node, // Assuming movies is an array
 };
 // function WatchedBox() {
 //   const [watched, setWatched] = useState(tempWatchedData);
@@ -174,7 +228,7 @@ function MovieList({ movies }) {
   );
 }
 MovieList.propTypes = {
-  movies: PropTypes.array.isRequired, // Assuming movies is an array of objects
+  movies: PropTypes.array, // Assuming movies is an array of objects
 };
 
 function Movie({ movie }) {
@@ -194,11 +248,11 @@ function Movie({ movie }) {
 
 Movie.propTypes = {
   movie: PropTypes.shape({
-    imdbID: PropTypes.string.isRequired,
-    Poster: PropTypes.string.isRequired,
-    Title: PropTypes.string.isRequired,
-    Year: PropTypes.string.isRequired,
-  }).isRequired,
+    imdbID: PropTypes.string,
+    Poster: PropTypes.string,
+    Title: PropTypes.string,
+    Year: PropTypes.string,
+  }),
 };
 
 function WatchedSummary({ watched }) {
@@ -234,11 +288,11 @@ function WatchedSummary({ watched }) {
 WatchedSummary.propTypes = {
   watched: PropTypes.arrayOf(
     PropTypes.shape({
-      imdbRating: PropTypes.number.isRequired,
-      userRating: PropTypes.number.isRequired,
-      runtime: PropTypes.number.isRequired,
+      imdbRating: PropTypes.number,
+      userRating: PropTypes.number,
+      runtime: PropTypes.number,
     })
-  ).isRequired,
+  ),
 };
 
 function WatchedMovieList({ watched }) {
@@ -254,14 +308,14 @@ function WatchedMovieList({ watched }) {
 WatchedMovieList.propTypes = {
   watched: PropTypes.arrayOf(
     PropTypes.shape({
-      imdbID: PropTypes.string.isRequired,
-      Poster: PropTypes.string.isRequired,
-      Title: PropTypes.string.isRequired,
-      imdbRating: PropTypes.number.isRequired,
-      userRating: PropTypes.number.isRequired,
-      runtime: PropTypes.number.isRequired,
+      imdbID: PropTypes.string,
+      Poster: PropTypes.string,
+      Title: PropTypes.string,
+      imdbRating: PropTypes.number,
+      userRating: PropTypes.number,
+      runtime: PropTypes.number,
     })
-  ).isRequired,
+  ),
 };
 
 function WatchedMovie({ movie }) {
@@ -289,10 +343,10 @@ function WatchedMovie({ movie }) {
 
 WatchedMovie.propTypes = {
   movie: PropTypes.shape({
-    Poster: PropTypes.string.isRequired,
-    Title: PropTypes.string.isRequired,
-    imdbRating: PropTypes.number.isRequired,
-    userRating: PropTypes.number.isRequired,
-    runtime: PropTypes.number.isRequired,
-  }).isRequired,
+    Poster: PropTypes.string,
+    Title: PropTypes.string,
+    imdbRating: PropTypes.number,
+    userRating: PropTypes.number,
+    runtime: PropTypes.number,
+  }),
 };

@@ -57,13 +57,13 @@ export default function StarRating({
 }
 
 StarRating.propTypes = {
-  maxRating: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-  size: PropTypes.number.isRequired,
+  maxRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
   className: PropTypes.string,
   message: PropTypes.arrayOf(PropTypes.string),
   defaultRating: PropTypes.number,
-  onSetRating: PropTypes.func.isRequired,
+  onSetRating: PropTypes.func,
 
 };
 
@@ -115,10 +115,10 @@ function Star({ onRate, full, onMouseIn, onMouseOut,color,size}) {
 }
 
 Star.propTypes = {
-  onRate: PropTypes.func.isRequired,
-  full: PropTypes.bool.isRequired,
-  onMouseIn: PropTypes.func.isRequired,
-  onMouseOut: PropTypes.func.isRequired,
-  color: PropTypes.string.isRequired,
-  size: PropTypes.number.isRequired,
+  onRate: PropTypes.func,
+  full: PropTypes.bool,
+  onMouseIn: PropTypes.func,
+  onMouseOut: PropTypes.func,
+  color: PropTypes.string,
+  size: PropTypes.number,
 };
